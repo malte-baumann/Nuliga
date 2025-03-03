@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bezirk Wiesbaden Spielübersicht</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden; /* Prevent overflow */
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 400px; /* Set a max width for larger screens */
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input {
+            width: calc(100% - 20px); /* Adjust width to account for padding */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .loading {
+            display: none;
+            margin-top: 10px;
+            font-size: 16px;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Bezirk Wiesbaden Spielübersicht</h1>
+        <label for="verein">Verein:</label>
+        <input type="text" id="verein" name="verein" required>
+        <button id="generateButton">Generieren</button>
+        <div id="loading" class="loading">Lade...</div>
+        <div id="message" class="error"></div>
+    </div>
+
+    <script>
+        const generateButton = document.getElementById('generateButton');
+        const loadingIndicator = document.getElementById('loading');
+        const messageDiv = document.getElementById('message');
+
+        function handleRequest() {
+            const verein = document.getElementById('verein').value;
+            const url = `http://localhost:5000/club?search_term=${encodeURIComponent(verein)}`;
+
+            loadingIndicator.style.display = 'block';
+            messageDiv.innerText = '';
+
+            fetch(url)
+                .then(response => {
+                    loadingIndicator.style.display = 'none';
+                    if (response.ok) {
+                        return response.blob().then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.style.display = 'none';
+                            a.href = url;
+                            a.download = 'spieluebersicht.xlsx'; // Set the desired file name
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                        });
+                    } else if (response.status === 404) {
+                        return response.text().then(text => {
+                            messageDiv.innerText = text;
+                        });
+                    } else {
+                        throw new Error('Das hat nicht geklappt.');
+                    }
+                })
+                .catch(error => {
+                    loadingIndicator.style.display = 'none';
+                    messageDiv.innerText = error.message;
+                });
+        }
+
+        generateButton.addEventListener('click', handleRequest);
+        document.getElementById('verein').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission
+                handleRequest();
+            }
+        });
+    </script>
+
+</body>
+</html>
