@@ -85,7 +85,7 @@
 
         function handleRequest() {
             const verein = document.getElementById('verein').value;
-            const url = `http://localhost:5000/club?search_term=${encodeURIComponent(verein)}`;
+            const url = `/club?search_term=${encodeURIComponent(verein)}`;
 
             loadingIndicator.style.display = 'block';
             messageDiv.innerText = '';
