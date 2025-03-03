@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, abort
+from flask import Flask, request, jsonify, send_file, abort, current_app
 from flask_cors import CORS
 import data
 import excel
@@ -71,6 +71,10 @@ def get_club_data():
         download_name=filename,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+
+@app.route('/')
+def index():
+    return current_app.send_static_file('index.html')
 
 @app.errorhandler(404)
 def not_found(_error):
