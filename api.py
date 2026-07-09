@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, send_file, abort, current_app
 from flask_cors import CORS
 import data
 import excel
+import exception
 from datetime import datetime
 import re
 from io import BytesIO
@@ -50,11 +51,19 @@ def get_club_data():
     if (now.month < 6):
         runde = "rueckrunde"
 
-    damen = data.get_rangliste(id, runde, "Damen", saison)
-    herren = data.get_rangliste(id, runde, "Herren", saison)
+    try: 
+        damen = data.get_rangliste(id, runde, "Damen", saison)
+    except exception.EmptyResult:
+        print(f"Keine Rangliste für {saison} gefunden. Versuche vorherige Saison.")
+        pre_saison = f"{year-1}/{str(year)[2:]}"
+        damen = data.get_rangliste(id, runde, "Damen", pre_saison)
+        herren = data.get_rangliste(id, runde, "Herren", pre_saison)
+    else:
+        herren = data.get_rangliste(id, runde, "Herren", saison)
+        
     rangliste = {"damen": damen, "herren": herren}
 
-    spiele, alle_mannschaften = data.get_alle_spiele(id, search_term)
+    spiele, alle_mannschaften = data.get_alle_spiele(id, search_term, saison)
     teams = [s for s in alle_mannschaften if search_term.lower() in s.lower()]
     sorted_teams = sorted(teams, key=sort_team)
 

@@ -9,6 +9,7 @@ DAY_WIDTH = 20
 team_row = {}
 
 def create_sheet(rangliste: dict[str, list], mannschaften: set, club_teams: list, spiele: dict, runde: str, filename: str):
+    print("Erstelle Excelsheet")
     workbook = Workbook()
     del workbook['Sheet']
 
@@ -22,7 +23,11 @@ def create_sheet(rangliste: dict[str, list], mannschaften: set, club_teams: list
 
 
     length = schreibe_mannschaften(sheet, club_teams)
-    schreibe_spiele(sheet, spiele)
+    try:
+        schreibe_spiele(sheet, spiele)
+    except:
+        print(team_row)
+        raise RuntimeError("Failed to write Games")
     length = schreibe_rangliste_header(sheet, length)
     length = schreibe_rangliste_banner(sheet, "Damen", length)
     length = schreibe_rangliste(sheet, damen, length)
@@ -104,6 +109,7 @@ def schreibe_mannschaften(sheet, mannschaften, index=2):
         cell.alignment = Alignment(horizontal="right", vertical="center")
         sheet.row_dimensions[i].height = CELL_DIMENSION
         team_row[mannschaft] = i
+        print(f"Set {mannschaft} to row {i}")
 
     return len(mannschaften) + index
 

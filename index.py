@@ -42,7 +42,7 @@ if __name__ == "__main__":
     herren = data.get_rangliste(id, runde, "Herren", saison)
     rangliste = {"damen": damen, "herren": herren}
 
-    spiele, alle_mannschaften = data.get_alle_spiele(id, search_term)
+    spiele, alle_mannschaften = data.get_alle_spiele(id, search_term, saison)
     teams = [s for s in alle_mannschaften if search_term.lower() in s.lower()]
     sorted_teams = sorted(teams, key=sort_team)
 
