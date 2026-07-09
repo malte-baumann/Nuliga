@@ -5,3 +5,5 @@ __pycache__/
 *.json
 test.py
 .vercel
+
+*.egg-info
