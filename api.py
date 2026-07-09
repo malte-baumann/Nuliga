@@ -33,6 +33,7 @@ def sort_team(s):
 @app.route('/club', methods=['GET'])
 def get_club_data():
     search_term = request.args.get('search_term')
+    print(f"Get Club Data with search {search_term}")
     id = 0
     try:
         club_site = data.search_club(search_term.lower())
